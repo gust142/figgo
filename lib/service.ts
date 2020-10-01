@@ -67,12 +67,33 @@ export async function getColors(
 ): Promise<string[]> {
 	const data = await auth(token, board);
 	if (data) {
-		const frames = data.document.children[0].children;
+		const frames = data.document.children[1].children;
 		const array = [];
-		const colorFrame = frames.filter(frame => frame.name === "Palette");
-		const colorBlocks = colorFrame[0].children.filter(
-			block => block.type === "RECTANGLE"
-		);
+		const colorFrame = frames.filter(frame => frame.name === "Color");
+            
+            var list = colorFrame[0].children.filter(frame => (frame.type === "INSTANCE" && !frame.clipsContent));
+            var tokensColor = [];
+            list.forEach(element => {
+                var title,value,token;
+                element.children.forEach(color=>{
+                    
+                    if(color.type == 'RECTANGLE'){
+                        value = color;
+                        
+                    }
+                    if(color.type == 'INSTANCE'||color.type == 'FRAME'){
+                        title = color;
+                    }
+                    
+                });
+                token = value;
+                token.name = title.children[0].children[0].name;
+                tokensColor.push(token);
+                
+            });
+            
+            const colorBlocks = tokensColor;
+            // const colorBlocks = colorFrame[0].children.filter(block => block.type === "RECTANGLE");
 		for (const i in colorBlocks) {
 			if (colorBlocks[i].fills[0].type === "SOLID") {
 				const name = colorBlocks[i].name;
@@ -92,17 +113,31 @@ export async function getSpaces(
 ): Promise<string[]> {
 	const data = await auth(token, board);
 	if (data) {
-		const frames = data.document.children[0].children;
+		const frames = data.document.children[1].children;
 		const array = [];
-		const spaceFrame = frames.filter(frame => frame.name === "Space");
-		const spaceBlocks = spaceFrame[0].children.filter(
-			blocks => blocks.type === "RECTANGLE"
-		);
+		const spaceFrame = frames.filter(frame => frame.name === "Spacing");
+            var list = spaceFrame[0].children.filter(element => element.layoutMode === "VERTICAL");
+            var tokenSpacing = [];
+            list.forEach(element => {
+                var token = element.children[0];
+                var object = {
+                    name:'',
+                    value:''
+                };
+                object.name = token.children[0].name;
+                object.value = token.children[1].children[1].name.replace(' px','px');
+                tokenSpacing.push(object);
+                
+            });
+
+            const spaceBlocks = tokenSpacing;
+
+            // const spaceBlocks = spaceFrame[0].children.filter(blocks => blocks.type === "RECTANGLE");
 
 		for (const i in spaceBlocks) {
 			if (spaceBlocks) {
 				const name = spaceBlocks[i].name;
-				const value = spaceBlocks[i].absoluteBoundingBox.width;
+				const value = spaceBlocks[i].value;
 				const newSpace = new Space(name, value);
 				array.push(newSpace[type]);
 			}

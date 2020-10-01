@@ -15,16 +15,14 @@ export default class Spacing {
 	}
 
 	get scss() {
-		return `$${this.uppercaseName}: ${this.value.toFixed(2)}px;`;
-	}
-
-	get js() {
-		const name = this.uppercaseName.replace(/-/g, "_");
-		return `export const ${name} = '${this.value.toFixed(2)}px';`;
-	}
-
-	get css() {
-		const name = this.lowercaseName.replace(/_/g, "-");
-		return `--${name}: ${this.value.toFixed(2)}px;`;
-	}
+        return `${this.uppercaseName}: ${this.value};`;
+    }
+    get js() {
+        const name = this.uppercaseName.replace(/-/g, "_");
+        return `export const ${name} = '${this.value}';`;
+    }
+    get css() {
+        const name = this.lowercaseName.replace(/_/g, "-");
+        return `--${name}: ${this.value};`;
+    }
 }
